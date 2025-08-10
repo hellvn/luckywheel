@@ -8,10 +8,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
-      VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
       VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+      VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
+      VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
