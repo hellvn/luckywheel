@@ -4,14 +4,22 @@ on:
     branches:
       - main
 jobs:
+  create-envfile:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Make envfile
+      uses: SpicyPizza/create-envfile@v2.0
+      with:
+        VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
+        VITE_GOOGLE_CLIENT_SECRET: ${{ vars.GOOGLE_CLIENT_SECRET }}
+        VITE_GOOGLE_SHEET_API_KEY: ${{ vars.GOOGLE_SHEET_API_KEY }}
+        VITE_GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
+        directory: luckywheel
+        file_name: .env
+        fail_on_empty: false
+        sort_keys: false
   build:
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
-      VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -23,8 +31,6 @@ jobs:
           rm -rf dist
       - name: Install Dependencies
         run: npm install
-      - name: Debug env variables
-        run: printenv | grep VITE
       - name: Build App
         run: npm run build -- --base=/luckywheel/
       - name: Archive artifact
@@ -57,14 +63,7 @@ jobs:
     environment:
       name: production
       url: ${{ steps.deployment.outputs.page_url }}
-
     runs-on: ubuntu-latest
-    env:
-      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
-      VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-      VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
-      VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
     steps:
       - name: Deploy to GitHub Pages
         id: deployment
