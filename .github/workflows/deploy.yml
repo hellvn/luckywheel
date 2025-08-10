@@ -1,5 +1,4 @@
 name: Deploy VueJS Project
-
 on:
   push:
     branches:
@@ -19,11 +18,10 @@ jobs:
           node-version: "20"
       - name: Install Dependencies
         run: npm install
-
       - name: Build App
         run: npm run build -- --base=/luckywheel/
       - name: Debug env variables
-        run: printenv | grep VITE
+        run: echo ${{ secrets }}
       - name: Archive artifact
         shell: sh
         run: |
