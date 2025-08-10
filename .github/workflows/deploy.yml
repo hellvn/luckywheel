@@ -7,6 +7,11 @@ on:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
+      VITE_GOOGLE_SHEET_ID: ${{ secrets.GOOGLE_SHEET_ID }}
+      VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+      VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,11 +20,7 @@ jobs:
       - name: Install Dependencies
         run: npm install
       - name: Build App
-        env:
-          VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.VITE_GOOGLE_SHEET_API_KEY }}
-          VITE_GOOGLE_SHEET_ID: ${{ secrets.VITE_GOOGLE_SHEET_ID }}
-          VITE_GOOGLE_CLIENT_ID: ${{ secrets.VITE_GOOGLE_CLIENT_ID }}
-          VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.VITE_GOOGLE_CLIENT_SECRET }}
+
         run: npm run build -- --base=/luckywheel/
       - name: Archive artifact
         shell: sh
