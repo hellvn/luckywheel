@@ -56,18 +56,18 @@
 
 <script lang="ts" setup>
 import { ref, onMounted, onUnmounted } from 'vue'
-import { useGoogleApi } from '../useGoogleApi.js';
+// import { useGoogleApi } from '../useGoogleApi.js';
 
 type Prize = { prize: string; color: string; chance: number }
 
-const {
-  isSignedIn,
-  userProfile,
-  signIn,
-  signOut,
-  initClient,
-  accessToken
-} = useGoogleApi();
+// const {
+//   isSignedIn,
+//   userProfile,
+//   signIn,
+//   signOut,
+//   initClient,
+//   accessToken
+// } = useGoogleApi();
 
 const size = 420
 const wheelCanvas = ref<HTMLCanvasElement | null>(null)
