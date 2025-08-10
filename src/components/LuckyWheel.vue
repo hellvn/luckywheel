@@ -132,18 +132,14 @@ function drawWheel() {
     ctx.moveTo(0, 0)
     ctx.arc(0, 0, outerR, start, end)
     ctx.closePath()
+    const g = ctx.createLinearGradient(
+      Math.cos(start + arc / 2) * -outerR, Math.sin(start + arc / 2) * -outerR,
+      Math.cos(start + arc / 2) * outerR, Math.sin(start + arc / 2) * outerR
+    )
+    g.addColorStop(0, lighten(p.color, 0.12))
+    g.addColorStop(1, p.color)
+    ctx.fillStyle = g
 
-    if (Number(p.chance) <= 0) {
-      ctx.fillStyle = '#e5e7eb' // gray
-    } else {
-      const g = ctx.createLinearGradient(
-        Math.cos(start + arc / 2) * -outerR, Math.sin(start + arc / 2) * -outerR,
-        Math.cos(start + arc / 2) * outerR, Math.sin(start + arc / 2) * outerR
-      )
-      g.addColorStop(0, lighten(p.color, 0.12))
-      g.addColorStop(1, p.color)
-      ctx.fillStyle = g
-    }
     ctx.fill()
     ctx.lineWidth = 6
     ctx.strokeStyle = '#fff'
@@ -152,7 +148,7 @@ function drawWheel() {
     // label
     ctx.save()
     ctx.rotate(start + arc / 2)
-    ctx.fillStyle = Number(p.chance) <= 0 ? '#9ca3af' : '#fff'
+    ctx.fillStyle = '#fff'
     ctx.font = 'bold 14px Inter, sans-serif'
     ctx.textAlign = 'right'
     ctx.fillText(p.prize, outerR - 26, 6)
@@ -296,7 +292,7 @@ function onSpinClick() { spinWheel() }
 
 // fetch prizes from API (optional)
 async function fetchPrizes() {
-  const range = "prizes!A2:C9"; // tuỳ chỉnh
+  const range = "prizes!A2:C"; // tuỳ chỉnh
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
   const response = await fetch(url);
   if (!response.ok) throw new Error('fetch failed')
