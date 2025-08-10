@@ -7,6 +7,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       VITE_GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
       VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
       VITE_GOOGLE_SHEET_API_KEY: ${{ secrets.GOOGLE_SHEET_API_KEY }}
@@ -16,18 +17,14 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "20"
+      - name: Clean old build artifacts
+        run: |
+          rm -rf node_modules
+          rm -rf dist
       - name: Install Dependencies
         run: npm install
-
-
-      - name: Export env variables
-        run: |
-          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
-          echo "VITE_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
-          echo "VITE_GOOGLE_SHEET_API_KEY=${{ secrets.GOOGLE_SHEET_API_KEY }}" >> $GITHUB_ENV
-          echo "VITE_GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}" >> $GITHUB_ENV
-
-
+      - name: Debug env variables
+        run: printenv | grep VITE
       - name: Build App
         run: npm run build -- --base=/luckywheel/
       - name: Archive artifact
