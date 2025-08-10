@@ -12,9 +12,8 @@ jobs:
       with:
         VITE_GOOGLE_CLIENT_ID: ${{ vars.GOOGLE_CLIENT_ID }}
         VITE_GOOGLE_CLIENT_SECRET: ${{ vars.GOOGLE_CLIENT_SECRET }}
-        VITE_GOOGLE_SHEET_API_KEY: ${{ vars.GOOGLE_SHEET_API_KEY }}
-        VITE_GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
-        # directory: luckywheel
+        VITE_GOOGLE_SHEET_API_KEY: AIzaSyCWw8wpnagz65gMcfIFDwiE9NvVogwP-vQ
+        VITE_GOOGLE_SHEET_ID: 1euciQtnXw-DCLrT7WH2ffwYaFHq7QtMA6CV-ebs4oE4
         file_name: .env
         fail_on_empty: false
         sort_keys: false
