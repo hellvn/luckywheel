@@ -18,10 +18,18 @@ jobs:
           node-version: "20"
       - name: Install Dependencies
         run: npm install
+
+
+      - name: Export env variables
+        run: |
+          echo "VITE_GOOGLE_CLIENT_ID=${{ secrets.GOOGLE_CLIENT_ID }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_CLIENT_SECRET=${{ secrets.GOOGLE_CLIENT_SECRET }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_SHEET_API_KEY=${{ secrets.GOOGLE_SHEET_API_KEY }}" >> $GITHUB_ENV
+          echo "VITE_GOOGLE_SHEET_ID=${{ secrets.GOOGLE_SHEET_ID }}" >> $GITHUB_ENV
+
+
       - name: Build App
         run: npm run build -- --base=/luckywheel/
-      - name: Debug env variables
-        run: echo ${{ secrets }}
       - name: Archive artifact
         shell: sh
         run: |
