@@ -16,7 +16,7 @@
             <span v-else>ĐANG QUAY</span>
 
             <!-- pointer attached to button (to the right) -->
-            <div class="absolute right-[-22px] top-1/2 -translate-y-1/2">
+            <div class="absolute rotate-180 left-full top-1/2 -translate-y-1/2">
               <svg width="36" height="36" viewBox="0 0 24 24" class="drop-shadow">
                 <path fill="#f59e0b" d="M2 12L22 6v12L2 12z"></path>
               </svg>
