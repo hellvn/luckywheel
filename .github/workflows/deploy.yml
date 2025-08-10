@@ -14,7 +14,7 @@ jobs:
         VITE_GOOGLE_CLIENT_SECRET: ${{ vars.GOOGLE_CLIENT_SECRET }}
         VITE_GOOGLE_SHEET_API_KEY: ${{ vars.GOOGLE_SHEET_API_KEY }}
         VITE_GOOGLE_SHEET_ID: ${{ vars.GOOGLE_SHEET_ID }}
-        directory: luckywheel
+        # directory: luckywheel
         file_name: .env
         fail_on_empty: false
         sort_keys: false
