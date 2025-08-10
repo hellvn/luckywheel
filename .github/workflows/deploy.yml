@@ -19,9 +19,11 @@ jobs:
           node-version: "20"
       - name: Install Dependencies
         run: npm install
-      - name: Build App
 
+      - name: Build App
         run: npm run build -- --base=/luckywheel/
+      - name: Debug env variables
+        run: printenv | grep VITE
       - name: Archive artifact
         shell: sh
         run: |
