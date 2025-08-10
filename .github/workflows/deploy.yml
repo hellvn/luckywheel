@@ -7,15 +7,13 @@ jobs:
   create-envfile:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      run: echo "google client id id ${{secrets.GOOGLE_CLIENT_SECRET}}"
     - name: Make envfile
       uses: SpicyPizza/create-envfile@v2.0
       with:
-        VITE_GOOGLE_CLIENT_ID: ${{ env.GOOGLE_CLIENT_ID }}
-        VITE_GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
-        VITE_GOOGLE_SHEET_API_KEY: AIzaSyCWw8wpnagz65gMcfIFDwiE9NvVogwP-vQ
-        VITE_GOOGLE_SHEET_ID: 1euciQtnXw-DCLrT7WH2ffwYaFHq7QtMA6CV-ebs4oE4
+        VITE_GOOGLE_CLIENT_ID: ${{secrets.GOOGLE_CLIENT_ID}}
+        VITE_GOOGLE_CLIENT_SECRET: ${{secrets.GOOGLE_CLIENT_SECRET}}
+        VITE_GOOGLE_SHEET_API_KEY: ${{secrets.GOOGLE_SHEET_API_KEY}}
+        VITE_GOOGLE_SHEET_ID: ${{secrets.GOOGLE_SHEET_ID}}
         file_name: .env
         fail_on_empty: false
         sort_keys: false
