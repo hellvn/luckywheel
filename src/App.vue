@@ -1,21 +1,21 @@
 <script setup lang="ts">
-import { onMounted } from 'vue';
+// import { onMounted } from 'vue';
 import LuckyWheel from './components/LuckyWheel.vue'
 
-declare interface Window {
-  gapi: any;
-}
+// declare interface Window {
+//   gapi: any;
+// }
 
-onMounted(() => {
-  window.gapi.load('client:auth2', () => {
-    window.gapi.client.init({
-      clientId: 'YOUR_CLIENT_ID',
-      scope: 'https://www.googleapis.com/auth/spreadsheets'
-    }).then(() => {
-      // gapi ready
-    });
-  });
-})
+// onMounted(() => {
+//   window.gapi.load('client:auth2', () => {
+//     window.gapi.client.init({
+//       clientId: 'YOUR_CLIENT_ID',
+//       scope: 'https://www.googleapis.com/auth/spreadsheets'
+//     }).then(() => {
+//       // gapi ready
+//     });
+//   });
+// })
 </script>
 
 <template>
