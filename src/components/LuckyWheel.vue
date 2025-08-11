@@ -1,7 +1,7 @@
-<script lang="ts" setup>
+<script setup lang="ts">
 import api from '../axiosInstance';
 import { ref, onMounted, onUnmounted } from 'vue'
-import Results from './Results.vue';
+import Results from '../components/Results.vue';
 import WinnerPopup from './WinnerPopup.vue';
 
 type Prize = { prize: string; color: string; chance: number }
