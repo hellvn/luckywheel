@@ -150,8 +150,9 @@ function drawWheel() {
     ctx.rotate(start + arc / 2)
     ctx.fillStyle = '#fff'
     ctx.font = 'bold 14px Inter, sans-serif'
-    ctx.textAlign = 'right'
-    ctx.fillText(p.prize, outerR - 26, 6)
+    ctx.textAlign = 'left'
+    ctx.textBaseline = "middle";
+    wrapText(ctx, p.prize, innerR + 26, 0, outerR/2, 16);
     ctx.restore()
   }
   ctx.restore()
@@ -165,6 +166,47 @@ function drawWheel() {
   ctx.strokeStyle = '#f59e0b'
   ctx.stroke()
 }
+
+// Hàm chia text thành nhiều dòng
+function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: number, maxWidth: number, lineHeight: number) {
+  const words = text.split(' ');
+  const lines = [];
+  let line = '';
+
+  for (let n = 0; n < words.length; n++) {
+    const testLine = line ? (line + ' ' + words[n]) : words[n];
+    if (ctx.measureText(testLine).width > maxWidth) {
+      if (line) {
+        lines.push(line);
+        line = words[n];
+      } else {
+        // một từ quá dài -> tách theo ký tự
+        let fragment = '';
+        for (const ch of words[n]) {
+          if (ctx.measureText(fragment + ch).width > maxWidth) {
+            if (fragment) lines.push(fragment);
+            fragment = ch;
+          } else {
+            fragment += ch;
+          }
+        }
+        line = fragment;
+      }
+    } else {
+      line = testLine;
+    }
+  }
+  if (line) lines.push(line);
+
+  // căn dọc: đặt tâm dọc của block text bằng y
+  const totalHeight = (lines.length - 1) * lineHeight;
+  const startY = y - totalHeight / 2;
+
+  lines.forEach((l, i) => {
+    ctx.fillText(l, x, startY + i * lineHeight);
+  });
+}
+
 
 // LED layer draws bulbs and cycles through colors
 function drawLEDs() {
