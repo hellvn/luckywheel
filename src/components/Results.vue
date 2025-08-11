@@ -7,50 +7,30 @@ const props = defineProps({
         default: () => []
     }
 });
-
-const doubledWinners = computed(() => [...props.winners, ...props.winners]);
-
-const offset = ref(0);
-let height = 0;
-let speed = 0.1; // px mỗi frame
-let rafId;
-
-const container = ref(null);
-const content = ref(null);
-
-function loop() {
-    offset.value += speed;
-    if (offset.value >= height ) {
-        offset.value = 0; // reset khi đã đi hết nửa danh sách
-    }
-    rafId = requestAnimationFrame(loop);
-}
-
-function startScroll() {
-    cancelAnimationFrame(rafId);
-    offset.value = 0;
-    height = content.value.scrollHeight;
-    loop();
-}
-
-onMounted(() => {
-    startScroll();
-});
-
-// Khi winners thay đổi thì khởi động lại scroll
-watch(doubledWinners, () => {
-    startScroll();
-});
-
-onUnmounted(() => cancelAnimationFrame(rafId));
 </script>
 
 <template>
-    <div ref="container" class="overflow-hidden h-20 relative">
-        <div ref="content" class="flex flex-col absolute w-full bottom-0" :style="{ transform: `translateY(${offset}px)` }">
-            <span v-for="(winner, index) in doubledWinners" :key="index" class="py-1 px-2">
-                🎉 {{ winner }}
-            </span>
-        </div>
+    <div ref="container" class="overflow-hidden h-50 relative">
+        <transition-group name="slide" tag="ul" class="space-y-2">
+            <li v-for="winner in winners" :key="winner.id" class="bg-white shadow p-2 rounded">
+                Chúc mừng <span class="font-bold text-red-500">{{ winner.name }}</span> đã trúng: <span class="font-bold text-blue-500">{{ winner.prize }}</span>
+            </li>
+        </transition-group>
     </div>
 </template>
+<style scoped>
+.slide-enter-active,
+.slide-leave-active {
+    transition: all 0.5s ease;
+}
+
+.slide-enter-from {
+    opacity: 0;
+    transform: translateY(-20px);
+}
+
+.slide-leave-to {
+    opacity: 0;
+    transform: translateY(20px);
+}
+</style>

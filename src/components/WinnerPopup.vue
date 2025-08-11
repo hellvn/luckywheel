@@ -1,13 +1,18 @@
 <template>
   <div v-if="show" class="fixed inset-0 flex items-center justify-center bg-black/50 z-50">
-    <div class="bg-white rounded-xl shadow-xl p-6 w-80 text-center relative animate-fadeIn">
+    <div class="bg-white rounded-xl shadow-xl p-6 w-lg text-center relative animate-fadeIn">
       <button class="absolute top-2 right-2 text-gray-500 hover:text-gray-800" @click="closePopup">
         ✖
       </button>
 
-      <h2 class="text-xl font-bold text-green-600 mb-2">🎉 Chúc mừng! 🎉</h2>
+      <h2 class="text-xl font-bold text-green-600 mb-2">{{ `🎉 Chúc mừng ${prize.name}! 🎉` }}</h2>
       <p class="text-gray-700 mb-4">
-        <span class="font-bold text-blue-500">{{ `${prize}!` }}</span>
+        <span class="font-bold text-blue-500" v-if="prize.prize !== 'Lời chúc'">
+          {{ `Bạn đã trúng ${prize.prize}!` }}
+        </span>
+        <span class="font-bold text-blue-500" v-else>
+          Bạn đã có một ngày tại sự kiện VIDEC 2025 thành công vui vẻ!
+        </span>
       </p>
 
       <button @click="closePopup" class="bg-blue-500 hover:bg-blue-600 text-white px-4 py-2 rounded-lg">
@@ -21,9 +26,12 @@
 import confetti from "canvas-confetti";
 import { watch } from "vue";
 
-const props = defineProps({
+const { show, prize } = defineProps({
   show: Boolean,
-  prize: String
+  prize: {
+    name: String,
+    prize: String
+  }
 });
 const emit = defineEmits(["close"]);
 
@@ -59,7 +67,7 @@ function launchConfetti() {
   }, 250);
 }
 
-watch(() => props.show, (newVal) => {
+watch(() => show, (newVal) => {
   if (newVal) {
     launchConfetti();
   }

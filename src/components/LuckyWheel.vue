@@ -14,46 +14,74 @@ const rotation = ref(0) // radians
 // prizes editable
 const prizes = ref<Prize[]>([])
 const showPopup = ref(false);
-const currentPrize = ref("");
+const currentPrize = ref({
+  name: '',
+  prize: ''
+});
 const player = ref({ name: '', phone: '', address: '' })
 const apiKey = import.meta.env.VITE_GOOGLE_SHEET_API_KEY;
 const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID;
-const appScriptKey = import.meta.env.VITE_GOOGLE_APP_SCRIPT_KEY;
 
-const results = ref<string[]>([
-  'Chúc mừng Vũ Phương Thảo đã trúng: Giải đặc biệt',
-  'Chúc mừng Nguyễn Ngọc Duy đã trúng: Voucher 10%',
-  'Chúc mừng Phùng Ngọc Thắng đã trúng: MyQ Implant',
-  'Chúc mừng Nguyễn Nhật Quang đã trúng: Yesbiotech Implant',
-  'Chúc mừng Dương Thị Phượng đã trúng: Voucher 10%',
-  'Chúc mừng Lương Xuân Giang đã trúng: Giải Đặc Biệt',
-  'Chúc Mừng Vũ Thị Nga đã trúng: Biologitech Implant',
-  'Chúc mừng Nguyễn Minh Giang đã trúng: MyQ Implant',
-  'Chúc mừng Hoàng Thị Mai Hiên đã trúng: Voucher 10%',
-  'Chúc mừng Trịnh Thị Ninh đã trúng: Yesbiotech Implant',
-  'Chúc mừng Trần Kiều Oanh đã trúng: MyQ Implant',
-  'Chúc mừng Vũ Hùng Thế đã trúng: Voucher 10%',
-  'Chúc mừng Phạm Tuấn Anh đã trúng: Biologitech Implant',
-  'Chúc mừng Bằng Văn Trần đã trúng:  Voucher 10%',
-  'Chúc mừng Tạ Thị Thu Hương đã trúng: Yesbiotech Implant',
-  'Chúc mừng Đỗ Trương Long đã trúng: Yesbiotech Implant',
-  'Chúc mừng Đỗ Xuân Hoạt đã trúng: MyQ Implant',
-  'Chúc mừng Lê Thị Bình đã trúng: Voucher 10%',
-  'Chúc mừng Nguyễn Thị Huệ đã trúng: Giải Đặc Biệt',
-  'Chúc mừng Nguyễn Thị Diệp Ngọc đã trúng: Biologitech Implant',
-  'Chúc mừng Đinh Văn Tình đã trúng: Voucher 10%',
-  'Chúc mừng Phạm Văn Tuyền đã trúng: Voucher 10%',
-  'Chúc mừng Dương Văn Hoàng đã trúng: Voucher 10%',
-  'Chúc mừng Đỗ Dương Long đã trúng: MyQ Implant',
-  'Chúc mừng Nguyễn Thị Lý đã trúng: Yesbiotech Implant',
-  'Chúc mừng Trần Văn Thạch đã trúng: Yesbiotech Implant',
-  'Chúc mừng Phạm Thị Duyên đã trúng: Biologitech Implant',
-  'Chúc mừng Nguyễn Hà Duy đã trúng: Voucher 10%',
-  'Chúc mừng Gia Đạt đã trúng: Biologitech Implant',
-  'Chúc mừng Hà Văn Thắng đã trúng: MyQ Implant',
-  'Chúc mừng Dương Thanh Thủy đã trúng: MyQ Implant',
-  'Chúc mừng Nguyễn Quốc Đạt đã trúng: Biologitech Implant',
-])
+const appScriptKey = import.meta.env.VITE_GOOGLE_APP_SCRIPT_KEY;
+// const fakePrizes = [
+//   'Giải đặc biệt',
+//   'Voucher 10%',
+//   'MyQ Implant',
+//   'Yesbiotech Implant',
+//   'Biologitech Implant'
+// ];
+
+const names = [
+  'Vũ Phương Thảo',
+  'Nguyễn Ngọc Duy',
+  'Phùng Ngọc Thắng',
+  'Nguyễn Nhật Quang',
+  'Dương Thị Phượng',
+  'Lương Xuân Giang',
+  'Vũ Thị Nga',
+  'Nguyễn Minh Giang',
+  'Hoàng Thị Mai Hiên',
+  'Trịnh Thị Ninh',
+  'Trần Kiều Oanh',
+  'Vũ Hùng Thế',
+  'Phạm Tuấn Anh',
+  'Bằng Văn Trần',
+  'Tạ Thị Thu Hương',
+  'Đỗ Trương Long',
+  'Đỗ Xuân Hoạt',
+  'Lê Thị Bình',
+  'Nguyễn Thị Huệ',
+  'Nguyễn Thị Diệp Ngọc',
+  'Đinh Văn Tình',
+  'Phạm Văn Tuyền',
+  'Dương Văn Hoàng',
+  'Đỗ Dương Long',
+  'Nguyễn Thị Lý',
+  'Trần Văn Thạch',
+  'Phạm Thị Duyên',
+  'Nguyễn Hà Duy',
+  'Gia Đạt',
+  'Hà Văn Thắng',
+  'Dương Thanh Thủy',
+  'Nguyễn Quốc Đạt',
+];
+
+function getRandomWinner() {
+  const name = names[Math.floor(Math.random() * names.length)];
+  const chosen = pickByChance()
+  const prize = prizes.value[chosen || 0].prize;
+  return {
+    id: Date.now() + Math.random(), // unique key
+    name,
+    prize: prize
+  }
+}
+
+const results = ref<{
+  id: number;
+  name: string;
+  prize: string;
+}[]>([])
 
 // LED animation state
 let ledAnimId = 0
@@ -283,9 +311,12 @@ function spinWheel() {
     } else {
       isSpinning.value = false
       const prizeLabel = prizes.value[chosen || 0].prize
-      const prized = `Chúc mừng ${player.value.name} đã trúng: ${prizeLabel}`
-      results.value.unshift(prized)
-      onSpinEnd(prized);
+      results.value.unshift({
+        id: Date.now() + Math.random(), // unique key
+        name: player.value.name,
+        prize: prizeLabel
+      })
+      onSpinEnd(player.value.name, prizeLabel);
       // send to webhook if set
       sendResultToSheet({
         date_time: formatDateTimeGMT7(),
@@ -362,14 +393,20 @@ function formatDateTimeGMT7() {
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
 }
 
-function onSpinEnd(prize: string) {
-  currentPrize.value = prize;
+function onSpinEnd(name: string, prize: string) {
+  currentPrize.value = {
+    name: name,
+    prize: prize
+  };
   showPopup.value = true;
 }
-
 // lifecycle
-onMounted(() => {
-  fetchPrizes()
+onMounted(async () => {
+  await fetchPrizes()
+  window.setInterval(() => {
+    results.value.unshift(getRandomWinner());
+    if (results.value.length > 20) results.value.pop(); // giữ danh sách gọn
+  }, 3000); // mỗi 3 giây thêm 1 kết quả giả
 
 })
 onUnmounted(() => {
@@ -380,7 +417,7 @@ onUnmounted(() => {
 <template>
   <div class="w-full max-w-6xl bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg grid md:grid-cols-2 gap-6">
     <!-- LEFT: Wheel + LEDs -->
-    <div class="flex flex-col items-center">
+    <div class="flex flex-col items-center justify-center">
       <div class="relative" :style="{ width: size + 'px', height: size + 'px' }">
         <!-- wheel canvas (rotates) -->
         <canvas ref="wheelCanvas" :width="size" :height="size" class="rounded-full"></canvas>
