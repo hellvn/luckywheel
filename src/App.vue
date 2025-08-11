@@ -1,40 +1,32 @@
 <script setup lang="ts">
-// import { onMounted } from 'vue';
 import LuckyWheel from './components/LuckyWheel.vue'
+import { loading } from './axiosInstance.js';
 
-// declare interface Window {
-//   gapi: any;
-// }
 
-// onMounted(() => {
-//   window.gapi.load('client:auth2', () => {
-//     window.gapi.client.init({
-//       clientId: 'YOUR_CLIENT_ID',
-//       scope: 'https://www.googleapis.com/auth/spreadsheets'
-//     }).then(() => {
-//       // gapi ready
-//     });
-//   });
-// })
 </script>
 
 <template>
-  <lucky-wheel />
+  <div class="min-h-screen bg-gradient-to-br from-pink-200 via-yellow-200 to-orange-200 p-6 flex items-center justify-center">
+    <transition name="fade">
+      <div v-if="loading" class="fixed inset-0 bg-black opacity-50 flex items-center justify-center z-50">
+        <div class="flex flex-col items-center gap-3">
+          <div class="w-12 h-12 border-4 border-white border-t-transparent rounded-full animate-spin"></div>
+          <span class="text-white text-lg font-semibold">Đang tải...</span>
+        </div>
+      </div>
+    </transition>
+
+    <lucky-wheel />
+  </div>
 </template>
-
 <style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.2s ease;
 }
 
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
+.fade-enter-from,
+.fade-leave-to {
+  opacity: 0;
 }
 </style>

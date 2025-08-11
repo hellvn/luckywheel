@@ -1,60 +1,5 @@
-<template>
-  <div class="min-h-screen bg-gradient-to-br from-pink-200 via-yellow-200 to-orange-200 p-6 flex items-center justify-center">
-    <div class="w-full max-w-6xl bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg grid md:grid-cols-2 gap-6">
-      <!-- LEFT: Wheel + LEDs -->
-      <div class="flex flex-col items-center">
-        <div class="relative" :style="{ width: size + 'px', height: size + 'px' }">
-          <!-- wheel canvas (rotates) -->
-          <canvas ref="wheelCanvas" :width="size" :height="size" class="rounded-full"></canvas>
-          <!-- LED canvas (top layer, does not rotate with wheel) -->
-          <canvas ref="ledCanvas" :width="size" :height="size" class="absolute left-0 top-0 pointer-events-none"></canvas>
-
-          <!-- center button (does not rotate) -->
-          <button :disabled="isSpinning" @click="onSpinClick" class="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transition-transform"
-            :class="isSpinning ? 'bg-gray-400' : 'bg-gradient-to-br from-yellow-400 to-orange-500 hover:scale-105'" title="Quay">
-            <span v-if="!isSpinning">QUAY</span>
-            <span v-else>ĐANG QUAY</span>
-
-            <!-- pointer attached to button (to the right) -->
-            <div class="absolute rotate-180 left-full top-1/2 -translate-y-1/2">
-              <svg width="36" height="36" viewBox="0 0 24 24" class="drop-shadow">
-                <path fill="#f59e0b" d="M2 12L22 6v12L2 12z"></path>
-              </svg>
-            </div>
-          </button>
-        </div>
-      </div>
-
-      <!-- RIGHT: Controls -->
-      <div>
-        <h2 class="text-2xl font-bold mb-3">Thông tin người chơi</h2>
-
-        <!-- player form -->
-        <div class="bg-white p-3 rounded-md shadow mb-4">
-          <label class="text-sm text-gray-600">Họ tên</label>
-          <input v-model="player.name" class="w-full border rounded px-3 py-2 mt-2" placeholder="Họ và tên" />
-
-          <label class="text-sm text-gray-600 mt-3">Số điện thoại</label>
-          <input v-model="player.phone" class="w-full border rounded px-3 py-2 mt-2" placeholder="Số điện thoại" />
-
-          <label class="text-sm text-gray-600 mt-3">Địa chỉ</label>
-          <input v-model="player.address" class="w-full border rounded px-3 py-2 mt-2" placeholder="Địa chỉ" />
-        </div>
-
-        <!-- results -->
-        <div class="bg-white p-3 rounded-md shadow">
-          <h3 class="font-semibold mb-2">Lịch sử kết quả</h3>
-          <ul class="text-sm space-y-1 max-h-40 overflow-auto">
-            <li v-for="(r, idx) in results" :key="idx" class="px-2 py-1 border-b last:border-b-0">{{ r }}</li>
-            <li v-if="results.length === 0" class="text-gray-400">Chưa có kết quả</li>
-          </ul>
-        </div>
-      </div>
-    </div>
-  </div>
-</template>
-
 <script lang="ts" setup>
+import api from '../axiosInstance';
 import { ref, onMounted, onUnmounted } from 'vue'
 // import { useGoogleApi } from '../useGoogleApi.js';
 
@@ -152,7 +97,7 @@ function drawWheel() {
     ctx.font = 'bold 14px Inter, sans-serif'
     ctx.textAlign = 'left'
     ctx.textBaseline = "middle";
-    wrapText(ctx, p.prize, innerR + 26, 0, outerR/2, 16);
+    wrapText(ctx, p.prize, innerR + 26, 0, outerR / 2, 16);
     ctx.restore()
   }
   ctx.restore()
@@ -315,7 +260,7 @@ function spinWheel() {
     } else {
       isSpinning.value = false
       const prizeLabel = prizes.value[chosen || 0].prize
-      results.value.unshift(`${new Date().toLocaleString()}: ${player.value.name} — ${prizeLabel}`)
+      results.value.unshift(`Chúc mừng ${player.value.name} đã trúng: ${prizeLabel}`)
       // send to webhook if set
       sendResultToSheet({
         date_time: formatDateTimeGMT7(),
@@ -336,14 +281,20 @@ function onSpinClick() { spinWheel() }
 async function fetchPrizes() {
   const range = "prizes!A2:C"; // tuỳ chỉnh
   const url = `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${range}?key=${apiKey}`;
-  const response = await fetch(url);
-  if (!response.ok) throw new Error('fetch failed')
-  const json = await response.json()
-  if (!Array.isArray(json.values)) throw new Error('invalid format')
-  prizes.value = json.values.map((p: any) => ({ prize: p[0], color: p[1], chance: Number(p[2]) }))
-  drawWheel();
-  drawLEDs();
-  startLEDAnimation();
+  try {
+    const response = await api.get(url);
+    if (response.status !== 200) {
+      throw new Error(`Fetch failed with status ${response.status}`);
+    }
+    const json = response.data;
+    if (!Array.isArray(json.values)) throw new Error('invalid format')
+    prizes.value = json.values.map((p: any) => ({ prize: p[0], color: p[1], chance: Number(p[2]) }))
+    drawWheel();
+    drawLEDs();
+    startLEDAnimation();
+  } catch (error) {
+    console.error(error);
+  }
 }
 
 
@@ -353,8 +304,11 @@ async function sendResultToSheet(payload: Record<string, any>) {
   if (!appScriptKey) return
   try {
     const params = new URLSearchParams(payload)
-    await fetch(`https://script.google.com/macros/s/${appScriptKey}/exec?${params.toString()}`);
+    await api.get(`https://script.google.com/macros/s/${appScriptKey}/exec?${params.toString()}`)
   } catch (e) { console.error('send webhook failed', e) }
+  finally {
+    player.value = { name: '', phone: '', address: '' }
+  }
 }
 
 // color lighten
@@ -394,6 +348,60 @@ onUnmounted(() => {
   stopLEDAnimation()
 })
 </script>
+
+<template>
+  <div class="w-full max-w-6xl bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-lg grid md:grid-cols-2 gap-6">
+    <!-- LEFT: Wheel + LEDs -->
+    <div class="flex flex-col items-center">
+      <div class="relative" :style="{ width: size + 'px', height: size + 'px' }">
+        <!-- wheel canvas (rotates) -->
+        <canvas ref="wheelCanvas" :width="size" :height="size" class="rounded-full"></canvas>
+        <!-- LED canvas (top layer, does not rotate with wheel) -->
+        <canvas ref="ledCanvas" :width="size" :height="size" class="absolute left-0 top-0 pointer-events-none"></canvas>
+
+        <!-- center button (does not rotate) -->
+        <button :disabled="isSpinning" @click="onSpinClick" class="absolute z-30 left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-28 h-28 rounded-full flex items-center justify-center text-white font-bold text-lg shadow-lg transition-transform"
+          :class="isSpinning ? 'bg-gray-400' : 'bg-gradient-to-br from-yellow-400 to-orange-500 hover:scale-105'" title="Quay">
+          <span v-if="!isSpinning">QUAY</span>
+          <span v-else>ĐANG QUAY</span>
+
+          <!-- pointer attached to button (to the right) -->
+          <div class="absolute rotate-180 left-full top-1/2 -translate-y-1/2">
+            <svg width="36" height="36" viewBox="0 0 24 24" class="drop-shadow">
+              <path fill="#f59e0b" d="M2 12L22 6v12L2 12z"></path>
+            </svg>
+          </div>
+        </button>
+      </div>
+    </div>
+
+    <!-- RIGHT: Controls -->
+    <div>
+      <h2 class="text-2xl font-bold mb-3">Thông tin người chơi</h2>
+
+      <!-- player form -->
+      <div class="bg-white p-3 rounded-md shadow mb-4">
+        <label class="text-sm text-gray-600">Họ tên</label>
+        <input v-model="player.name" class="w-full border rounded px-3 py-2 mt-2" placeholder="Họ và tên" />
+
+        <label class="text-sm text-gray-600 mt-3">Số điện thoại</label>
+        <input v-model="player.phone" class="w-full border rounded px-3 py-2 mt-2" placeholder="Số điện thoại" />
+
+        <label class="text-sm text-gray-600 mt-3">Địa chỉ</label>
+        <input v-model="player.address" class="w-full border rounded px-3 py-2 mt-2" placeholder="Địa chỉ" />
+      </div>
+
+      <!-- results -->
+      <div class="bg-white p-3 rounded-md shadow">
+        <h3 class="font-semibold mb-2">Lịch sử kết quả</h3>
+        <ul class="text-sm space-y-1 max-h-40 overflow-auto">
+          <li v-for="(r, idx) in results" :key="idx" class="px-2 py-1 border-b last:border-b-0">{{ r }}</li>
+          <li v-if="results.length === 0" class="text-gray-400">Chưa có kết quả</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</template>
 
 <style scoped>
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap');
