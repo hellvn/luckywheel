@@ -284,9 +284,7 @@ function spinWheel() {
       const prizeLabel = prizes.value[chosen || 0].prize
       const prized = `Chúc mừng ${player.value.name} đã trúng: ${prizeLabel}`
       results.value.unshift(prized)
-      setTimeout(() => {
-        onSpinEnd(prized);
-      }, 4000);
+      onSpinEnd(prized);
       // send to webhook if set
       sendResultToSheet({
         date_time: formatDateTimeGMT7(),
