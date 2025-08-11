@@ -19,6 +19,7 @@ const player = ref({ name: '', phone: '', address: '' })
 const apiKey = import.meta.env.VITE_GOOGLE_SHEET_API_KEY;
 const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID;
 const appScriptKey = import.meta.env.VITE_GOOGLE_APP_SCRIPT_KEY;
+
 const results = ref<string[]>([
   'Chúc mừng Vũ Phương Thảo đã trúng: Giải đặc biệt',
   'Chúc mừng Nguyễn Ngọc Duy đã trúng: Voucher 10%',
@@ -326,7 +327,7 @@ async function sendResultToSheet(payload: Record<string, any>) {
   if (!appScriptKey) return
   try {
     const params = new URLSearchParams(payload)
-    await api.get(`https://script.google.com/macros/s/${appScriptKey}/exec?${params.toString()}`)
+    await fetch(`https://script.google.com/macros/s/${appScriptKey}/exec?${params.toString()}`)
   } catch (e) { console.error('send webhook failed', e) }
   finally {
     player.value = { name: '', phone: '', address: '' }
