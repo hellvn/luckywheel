@@ -2,19 +2,9 @@
 import api from '../axiosInstance';
 import { ref, onMounted, onUnmounted } from 'vue'
 import Results from './Results.vue';
-// import { useGoogleApi } from '../useGoogleApi.js';
+import WinnerPopup from './WinnerPopup.vue';
 
 type Prize = { prize: string; color: string; chance: number }
-
-// const {
-//   isSignedIn,
-//   userProfile,
-//   signIn,
-//   signOut,
-//   initClient,
-//   accessToken
-// } = useGoogleApi();
-
 const size = 420
 const wheelCanvas = ref<HTMLCanvasElement | null>(null)
 const ledCanvas = ref<HTMLCanvasElement | null>(null)
@@ -23,7 +13,8 @@ const rotation = ref(0) // radians
 
 // prizes editable
 const prizes = ref<Prize[]>([])
-
+const showPopup = ref(false);
+const currentPrize = ref("");
 const player = ref({ name: '', phone: '', address: '' })
 const apiKey = import.meta.env.VITE_GOOGLE_SHEET_API_KEY;
 const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID;
@@ -42,6 +33,25 @@ const results = ref<string[]>([
   'Chúc mừng Trần Kiều Oanh đã trúng: MyQ Implant',
   'Chúc mừng Vũ Hùng Thế đã trúng: Voucher 10%',
   'Chúc mừng Phạm Tuấn Anh đã trúng: Biologitech Implant',
+  'Chúc mừng Bằng Văn Trần đã trúng:  Voucher 10%',
+  'Chúc mừng Tạ Thị Thu Hương đã trúng: Yesbiotech Implant',
+  'Chúc mừng Đỗ Trương Long đã trúng: Yesbiotech Implant',
+  'Chúc mừng Đỗ Xuân Hoạt đã trúng: MyQ Implant',
+  'Chúc mừng Lê Thị Bình đã trúng: Voucher 10%',
+  'Chúc mừng Nguyễn Thị Huệ đã trúng: Giải Đặc Biệt',
+  'Chúc mừng Nguyễn Thị Diệp Ngọc đã trúng: Biologitech Implant',
+  'Chúc mừng Đinh Văn Tình đã trúng: Voucher 10%',
+  'Chúc mừng Phạm Văn Tuyền đã trúng: Voucher 10%',
+  'Chúc mừng Dương Văn Hoàng đã trúng: Voucher 10%',
+  'Chúc mừng Đỗ Dương Long đã trúng: MyQ Implant',
+  'Chúc mừng Nguyễn Thị Lý đã trúng: Yesbiotech Implant',
+  'Chúc mừng Trần Văn Thạch đã trúng: Yesbiotech Implant',
+  'Chúc mừng Phạm Thị Duyên đã trúng: Biologitech Implant',
+  'Chúc mừng Nguyễn Hà Duy đã trúng: Voucher 10%',
+  'Chúc mừng Gia Đạt đã trúng: Biologitech Implant',
+  'Chúc mừng Hà Văn Thắng đã trúng: MyQ Implant',
+  'Chúc mừng Dương Thanh Thủy đã trúng: MyQ Implant',
+  'Chúc mừng Nguyễn Quốc Đạt đã trúng: Biologitech Implant',
 ])
 
 // LED animation state
@@ -167,7 +177,6 @@ function wrapText(ctx: CanvasRenderingContext2D, text: string, x: number, y: num
   });
 }
 
-
 // LED layer draws bulbs and cycles through colors
 function drawLEDs() {
   const canvas = ledCanvas.value
@@ -206,8 +215,6 @@ function drawLEDs() {
     ctx.shadowBlur = 0
   }
 }
-
-
 
 // LED animation loop (runs always)
 function startLEDAnimation() {
@@ -275,7 +282,11 @@ function spinWheel() {
     } else {
       isSpinning.value = false
       const prizeLabel = prizes.value[chosen || 0].prize
-      results.value.unshift(`Chúc mừng ${player.value.name} đã trúng: ${prizeLabel}`)
+      const prized = `Chúc mừng ${player.value.name} đã trúng: ${prizeLabel}`
+      results.value.unshift(prized)
+      setTimeout(() => {
+        onSpinEnd(prized);
+      }, 4000);
       // send to webhook if set
       sendResultToSheet({
         date_time: formatDateTimeGMT7(),
@@ -311,8 +322,6 @@ async function fetchPrizes() {
     console.error(error);
   }
 }
-
-
 
 // send result
 async function sendResultToSheet(payload: Record<string, any>) {
@@ -352,6 +361,11 @@ function formatDateTimeGMT7() {
   const seconds = pad(gmt7Date.getUTCSeconds());
 
   return `${day}/${month}/${year} ${hours}:${minutes}:${seconds}`;
+}
+
+function onSpinEnd(prize: string) {
+  currentPrize.value = prize;
+  showPopup.value = true;
 }
 
 // lifecycle
@@ -413,6 +427,7 @@ onUnmounted(() => {
       </div>
     </div>
   </div>
+  <WinnerPopup :show="showPopup" :prize="currentPrize" @close="showPopup = false" />
 </template>
 
 <style scoped>
