@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import api from '../axiosInstance';
 import { ref, onMounted, onUnmounted } from 'vue'
+import Results from './Results.vue';
 // import { useGoogleApi } from '../useGoogleApi.js';
 
 type Prize = { prize: string; color: string; chance: number }
@@ -27,7 +28,21 @@ const player = ref({ name: '', phone: '', address: '' })
 const apiKey = import.meta.env.VITE_GOOGLE_SHEET_API_KEY;
 const sheetId = import.meta.env.VITE_GOOGLE_SHEET_ID;
 const appScriptKey = import.meta.env.VITE_GOOGLE_APP_SCRIPT_KEY;
-const results = ref<string[]>([])
+const results = ref<string[]>([
+  'Chúc mừng Vũ Phương Thảo đã trúng: Giải đặc biệt',
+  'Chúc mừng Nguyễn Ngọc Duy đã trúng: Voucher 10%',
+  'Chúc mừng Phùng Ngọc Thắng đã trúng: MyQ Implant',
+  'Chúc mừng Nguyễn Nhật Quang đã trúng: Yesbiotech Implant',
+  'Chúc mừng Dương Thị Phượng đã trúng: Voucher 10%',
+  'Chúc mừng Lương Xuân Giang đã trúng: Giải Đặc Biệt',
+  'Chúc Mừng Vũ Thị Nga đã trúng: Biologitech Implant',
+  'Chúc mừng Nguyễn Minh Giang đã trúng: MyQ Implant',
+  'Chúc mừng Hoàng Thị Mai Hiên đã trúng: Voucher 10%',
+  'Chúc mừng Trịnh Thị Ninh đã trúng: Yesbiotech Implant',
+  'Chúc mừng Trần Kiều Oanh đã trúng: MyQ Implant',
+  'Chúc mừng Vũ Hùng Thế đã trúng: Voucher 10%',
+  'Chúc mừng Phạm Tuấn Anh đã trúng: Biologitech Implant',
+])
 
 // LED animation state
 let ledAnimId = 0
@@ -394,10 +409,7 @@ onUnmounted(() => {
       <!-- results -->
       <div class="bg-white p-3 rounded-md shadow">
         <h3 class="font-semibold mb-2">Lịch sử kết quả</h3>
-        <ul class="text-sm space-y-1 max-h-40 overflow-auto">
-          <li v-for="(r, idx) in results" :key="idx" class="px-2 py-1 border-b last:border-b-0">{{ r }}</li>
-          <li v-if="results.length === 0" class="text-gray-400">Chưa có kết quả</li>
-        </ul>
+        <Results :winners="results" />
       </div>
     </div>
   </div>
@@ -418,5 +430,19 @@ canvas {
 /* small safety in case Tailwind not loaded */
 .bg-white\/80 {
   background-color: rgba(255, 255, 255, 0.8)
+}
+
+@keyframes vertical-down {
+  0% {
+    transform: translateY(-50%);
+  }
+
+  100% {
+    transform: translateY(0);
+  }
+}
+
+.animate-vertical-down {
+  animation: vertical-down 20s linear infinite;
 }
 </style>
